@@ -27,9 +27,17 @@ class Conversation(BaseService, Find, FindAll, Save, Load):
         """Return the URL for the specified resource in this collection."""
         return "/%s/%s/reply" % (self.collection, _id)
 
+    def last_resource_url(self):
+        """Return the URL for the specified resource in this collection."""
+        return "/%s/last/reply" % (self.collection,)
+
     def reply(self, **reply_data):
         """Reply to a message."""
         return self.__reply(reply_data)
+
+    def reply_last(self, **reply_data):
+        """Reply to a message."""
+        return self.__reply_last(reply_data)
 
     def assign(self, **reply_data):
         """Assign a conversation to a user."""
@@ -60,4 +68,9 @@ class Conversation(BaseService, Find, FindAll, Save, Load):
         _id = reply_data.pop('id')
         reply_data['conversation_id'] = _id
         response = self.client.post(self.resource_url(_id), reply_data)
+        return self.collection_class().from_response(response)
+
+    def __reply_last(self, reply_data):
+        """Send requests to the resource handler."""
+        response = self.client.post(self.last_resource_url(), reply_data)
         return self.collection_class().from_response(response)
