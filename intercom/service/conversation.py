@@ -31,6 +31,10 @@ class Conversation(BaseService, Find, FindAll, Save, Load):
         """Return the URL for the specified resource in this collection."""
         return "/%s/last/reply" % (self.collection,)
 
+    def tag_resource_url(self, _id):
+        """Return the URL for the specified resource in this collection."""
+        return "/%s/%s/tags" % (self.collection, _id)
+
     def reply(self, **reply_data):
         """Reply to a message."""
         return self.__reply(reply_data)
@@ -73,4 +77,10 @@ class Conversation(BaseService, Find, FindAll, Save, Load):
     def __reply_last(self, reply_data):
         """Send requests to the resource handler."""
         response = self.client.post(self.last_resource_url(), reply_data)
+        return self.collection_class().from_response(response)
+
+    def tag(self, tag_data):
+        """Send requests to the tag resource handler."""
+        _id = tag_data.pop('conversation_id')
+        response = self.client.post(self.tag_resource_url(_id), tag_data)
         return self.collection_class().from_response(response)
